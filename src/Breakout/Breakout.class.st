@@ -87,10 +87,10 @@ Breakout >> keyDownEvent: anEvent [
 	| delta scanCode |
 	delta := 0.
 	scanCode := anEvent scanCode . 
-	{ 4 . 80 } includes: scanCode  "Left arrow"
+	({ 4 . 80 } includes: scanCode)  "Left arrow"
 		ifTrue: [ Transcript show: 'left arrow pressed' ; cr . 
 			       delta := -10 ].
-	{ 7 } includes: scanCode  "Right arrow"
+	({ 7 } includes: scanCode)  "Right arrow"
 		ifTrue: [ Transcript show: 'right arrow pressed' ; cr . 
 			       delta := 10 ].
 	"show the key that was pressed"
