@@ -31,13 +31,13 @@ Breakout >> gameLoop [
         [  self updateGame . 
           "(Delay forMilliseconds: 16) wait."
            Transcript show: 'tick' ; cr . 
- 	"wait one second "
-          (Delay forMilliseconds: 1000) wait. 
-           "some way to escape game loop"
-          stopMe ifTrue: [ ^ true ].
-        ] repeat 
+ 	       "wait one second "
+          (Delay forMilliseconds: 1000) wait.          
+          stopMe.  ] whileTrue. 
+       "keep looping while last thing evald is true "
     ] on: Error do: [ :ex | Transcript cr; show: ex description ] 
 ] forkNamed: 'Game Loop'.
+
 
 
 ]
