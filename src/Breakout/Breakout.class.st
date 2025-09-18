@@ -21,7 +21,7 @@ Class {
 { #category : 'initialization' }
 Breakout >> gameHalt [
  isRunning := false . 
- [ Processor terminateActiveProcessNamed: 'Game Loop' ]
+ [ Processor terminateActiveProcessNamed: 'GameLoop' ]
     on: Error do: [ :ex | Transcript show: 'No Game Loop process found'; cr ].
 
 
@@ -43,7 +43,7 @@ Breakout >> gameLoop [
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
     ] on: Error do: [ :ex | Transcript cr; show: ex description ] 
-] forkNamed: 'Game Loop'.
+] forkNamed: 'GameLoop'.
 
 
 
@@ -180,6 +180,7 @@ Breakout >> updateGame [
 	pos := bat position.
 	isMovingLeft ifTrue: [ pos := pos - (delta @ 0) ].
 	isMovingRight ifTrue: [ pos := pos + (delta @ 0) ]. 
+	bat position:  pos . 
 	
 	#(
 	"Boundary checks"
