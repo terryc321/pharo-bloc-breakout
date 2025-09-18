@@ -21,75 +21,22 @@ Class {
 
 { #category : 'initialization' }
 Breakout >> animateLeft [
-    | animation pos | 
-   isAnimating ifTrue: [  ] ifFalse: [ 
+    | pos | 
 
-   animation := BlTransformAnimation new        
-        duration: duration milliSeconds;
-        easing: BlLinearInterpolator default;
-        absolute;
-     "Move 300 pixels right"
-        transformDo: [ :aBuilder | aBuilder translateBy: ( (0 - delta) @ 0) ];  
-        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr. 
-	                     isAnimating := false.
-	                     bat position: (bat position x - delta)@(bat position y). 
-	                   ].
-    bat addAnimation: animation.
-    isAnimating := true. 
-   ].
-   
- " aSpace requestNextPulse."
+    pos := bat position . 
+     pos := pos - (delta@0).
+     bat position: pos . 
 
 
 ]
 
 { #category : 'initialization' }
 Breakout >> animateRight [
-    | animation pos |
+    | pos |
 
- isAnimating ifTrue: [  ] ifFalse:[
-  animation := BlTransformAnimation new        
-        duration: duration milliSeconds;
-        easing: BlLinearInterpolator default;
-        absolute;
-     "Move 300 pixels right"
-        transformDo: [ :aBuilder | aBuilder translateBy: ( delta @ 0) ];  
-        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr. 	                    
-	                      isAnimating := false.
-							 bat position: (bat position x + delta)@(bat position y). 
-						
-	                   ].
-    bat addAnimation: animation.
-    isAnimating := true. 
-   ].
-
-   "aSpace requestNextPulse."
-
-    "self listAnimations ."
-
-
-
-
-#(
     pos := bat position . 
-
-    animation := BlTransformAnimation new        
-        duration: duration milliSeconds;
-        easing: BlLinearInterpolator default;
-        absolute;
-     "Move 300 pixels right"
-        transformDo: [ :aBuilder | aBuilder translateBy: (delta @ 0) ];  
-        onFinishedDo: [ bat position: pos + (delta@0).  
-		                     bat extent: 100 @ 20 .  
-	                    "Transcript show: 'Animation done at: ', bat position asString; cr "
-	    ].
-    bat addAnimation: animation.
-
      pos := pos + (delta@0).
      bat position: pos . 
-
-).
-
 
 
 ]
@@ -133,7 +80,7 @@ Breakout >> gameLoop [
  	       "wait one second "
           "(Delay forMilliseconds: 1000) wait."          
  	       "wait 16 milliseconds second "
-          (Delay forMilliseconds: 16) wait.
+          (Delay forMilliseconds: 2) wait.
 
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
@@ -267,6 +214,20 @@ Breakout >> keyUpEvent: anEvent [
 		ifTrue: [ Transcript show: 'right arrow up' ; show: bat position ; cr . 
 			    isMovingRight := false.   
 			 ].
+		
+	({ 81 } includes: scanCode)  "down arrow"
+		ifTrue: [  
+			    delta := (delta - 1) max: 1 . 
+			Transcript show: 'down arrow up => delta = ' ; show: delta ; cr . 
+			 ].
+
+	({ 82 } includes: scanCode)  "up arrow"
+		ifTrue: [ 
+			    delta := delta + 1 . 
+			Transcript show: 'up arrow up => delta = ' ; show: delta ; cr . 
+			 ].
+
+		
 	"show the key that was pressed"
 	Transcript show: 'key scancode = ' ; show: anEvent scanCode ; cr . 
 	
