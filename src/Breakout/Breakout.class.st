@@ -11,11 +11,33 @@ Class {
 		'delta',
 		'isMovingLeft',
 		'isMovingRight',
-		'animation'
+		'animation',
+		'stopMe'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
 }
+
+{ #category : 'initialization' }
+Breakout >> gameHalt [
+ stopMe := true . 
+
+]
+
+{ #category : 'initialization' }
+Breakout >> gameLoop [ 
+  [ 
+    [ 
+        [  self updateGame . 
+          (Delay forMilliseconds: 16) wait.
+           "some way to escape game loop"
+          stopMe ifTrue: [ ^ true ].
+        ] repeat 
+    ] on: Error do: [ :ex | Transcript cr; show: ex description ] 
+] forkNamed: 'Game Loop'.
+
+
+]
 
 { #category : 'initialization' }
 Breakout >> initialize [
@@ -87,36 +109,13 @@ Breakout >> initialize [
 "aSpace root addEventHandler: (BlEventHandler on: BlKeyDownEvent do: [ :anEvent | bat keyDownEvent: anEvent ])."
 aSpace root addEventHandler: (BlEventHandler on: BlKeyDownEvent do: [ :anEvent | self keyDownEvent: anEvent ]).
 
-"================================================"
-"Create a game loop using BlTask"
-"aSpace addEventHandler: (BlEventHandler on: BlSpaceFrameEvent do: [ :anEvent |
-    self tick.
-])."
-
-"=================================================="
-"Create an animation loop"
-animation := BlAnimation new
-    duration: 16 milliSeconds; "Roughly 60 FPS"
-    onStepDo: [ :aDeltaTime |
-        | newPosition |
-        newPosition := bat position.
-        isMovingLeft ifTrue: [ newPosition := newPosition - (delta @ 0) ].
-        isMovingRight ifTrue: [ newPosition := newPosition + (delta @ 0) ].
-        
-        "Boundary checks"
-        newPosition x < 0 ifTrue: [ newPosition := 0 @ newPosition y ].
-        newPosition x > (aSpace extent x - bat size x) ifTrue: [ 
-            newPosition := (aSpace extent x - bat size x) @ newPosition y ].
-        
-        bat position: newPosition.
-    ];
-    loopCount: -1. "Run indefinitely"
-
-"Start the animation"
-aSpace enqueueTask: animation.
-
 "finally show window "
-	aSpace show
+	aSpace show.
+	
+"start a background process for game loop"
+self gameLoop.	
+	
+
 ]
 
 { #category : 'initialization' }
@@ -163,16 +162,18 @@ Breakout >> keyUpEvent: anEvent [
 ]
 
 { #category : 'initialization' }
-Breakout >> tick [
-	"move bat"
-	isMovingRight ifTrue: [  
-		bat position: (bat position + (delta@0)).
-	]
-	isMovingLeft ifTrue: [  
-		bat position: (bat position - (delta@0)).
-	]
-
-
-	
-
+Breakout >> updateGame [
+	 | newPosition |
+  newPosition := bat position.
+        isMovingLeft ifTrue: [ newPosition := newPosition - (delta @ 0) ].
+        isMovingRight ifTrue: [ newPosition := newPosition + (delta @ 0) ].
+        
+        "Boundary checks"
+        newPosition x < 0 ifTrue: [ newPosition := 0 @ newPosition y ].
+        newPosition x > (aSpace extent x - bat size x) ifTrue: [ 
+            newPosition := (aSpace extent x - bat size x) @ newPosition y ].        
+        bat position: newPosition.
+ 
+ "do we need to tell somebody the bat has moved ? "   
+ 
 ]
