@@ -29,7 +29,10 @@ Breakout >> gameLoop [
   [ 
     [ 
         [  self updateGame . 
-          (Delay forMilliseconds: 16) wait.
+          "(Delay forMilliseconds: 16) wait."
+           Transcript show: 'tick' ; cr . 
+ 	"wait one second "
+          (Delay forMilliseconds: 1000) wait. 
            "some way to escape game loop"
           stopMe ifTrue: [ ^ true ].
         ] repeat 
@@ -46,7 +49,7 @@ Breakout >> initialize [
    delta := 10 . 
    isMovingLeft := false. 
    isMovingRight := false. 
-
+   stopMe := false. 
 
 	aSpace := BlSpace new. "make a window "
 	root := aSpace root. "access root element"
@@ -163,17 +166,14 @@ Breakout >> keyUpEvent: anEvent [
 
 { #category : 'initialization' }
 Breakout >> updateGame [
-	 | newPosition |
-  newPosition := bat position.
-        isMovingLeft ifTrue: [ newPosition := newPosition - (delta @ 0) ].
-        isMovingRight ifTrue: [ newPosition := newPosition + (delta @ 0) ].
-        
-        "Boundary checks"
-        newPosition x < 0 ifTrue: [ newPosition := 0 @ newPosition y ].
-        newPosition x > (aSpace extent x - bat size x) ifTrue: [ 
-            newPosition := (aSpace extent x - bat size x) @ newPosition y ].        
-        bat position: newPosition.
- 
- "do we need to tell somebody the bat has moved ? "   
- 
+
+	| newPosition |
+	newPosition := bat position.
+	isMovingLeft ifTrue: [ newPosition := newPosition - (delta @ 0) ].
+	isMovingRight ifTrue: [ newPosition := newPosition + (delta @ 0) ]. "Boundary checks"
+	newPosition x < 0 ifTrue: [ newPosition := 0 @ newPosition y ].
+	newPosition x > (aSpace extent x - bat extent x) ifTrue: [ newPosition := aSpace extent x - bat size x @ newPosition y ].
+	bat position: newPosition.
+	
+	 "do we need to tell somebody the bat has moved ? "
 ]
