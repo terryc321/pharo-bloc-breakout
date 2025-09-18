@@ -20,8 +20,8 @@ Class {
 
 { #category : 'initialization' }
 Breakout >> animateLeft [
-    | animation pos |
-    pos := bat position. 
+    | animation pos | 
+    pos := bat position.         
      
     animation := BlTransformAnimation new
          duration: duration milliSeconds;
@@ -29,7 +29,10 @@ Breakout >> animateLeft [
         absolute;
      "Move 30 pixels left"
         transformDo: [ :aBuilder | aBuilder translateBy: (0 - delta) @ 0 ];  
-        onFinishedDo: [ bat position: pos - (0 - delta)@0.  
+        onFinishedDo: [ bat position: pos - (0 - delta)@0. 
+	                  "bounds checks"
+	                     bat position x < 0 ifTrue: [ bat position: 0@(bat position y) ] .
+	                     bat extent: 100 @ 20 .  
 	                    "Transcript show: 'Animation done at: ', (bat position asString); cr "
 	                     ].
     bat addAnimation: animation.
@@ -48,6 +51,7 @@ Breakout >> animateRight [
      "Move 300 pixels right"
         transformDo: [ :aBuilder | aBuilder translateBy: (delta @ 0) ];  
         onFinishedDo: [ bat position: pos + (delta@0).  
+		                     bat extent: 100 @ 20 .  
 	                    "Transcript show: 'Animation done at: ', bat position asString; cr "
 	    ].
     bat addAnimation: animation.
@@ -107,9 +111,9 @@ Breakout >> initialize [
 	super initialize. "make some bricks all random colours "
 
    "how far bat moves"
-   delta := 20 . 
+   delta := 100 . 
    "animated over what duration"
-   duration := 30. 
+   duration := 300. 
 
    isMovingLeft := false. 
    isMovingRight := false. 
@@ -233,23 +237,9 @@ Breakout >> keyUpEvent: anEvent [
 
 { #category : 'initialization' }
 Breakout >> updateGame [
-
-	#( | pos |
-	pos := (bat position x) @ 600.
-	).
 	
 	isMovingLeft ifTrue: [ self animateLeft ].
 	isMovingRight ifTrue: [ self animateRight ]. 
 	isMovingLeft not and: [ isMovingRight not ifTrue:[ self animateStop ]].
-	
-	#(bat position:  pos . ).
-	
-	#(
-	"Boundary checks"
-	pos x < 0 ifTrue: [ pos := 0 @ pos y ].
-	pos x > ((aSpace extent x) - (bat extent x)) ifTrue: [ pos := (aSpace extent x) - bat size x @ pos y ].
-	bat position: newPosition.
-	).
-	
-	 "do we need to tell somebody the bat has moved ? "
+
 ]
