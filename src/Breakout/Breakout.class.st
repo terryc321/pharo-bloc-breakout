@@ -133,13 +133,15 @@ Breakout >> keyDownEvent: anEvent [
 	| scanCode |
 	delta := 0.
 	scanCode := anEvent scanCode . 
-	({ 4 . 80 } includes: scanCode)  "Left arrow"
-		ifTrue: [ Transcript show: 'left arrow down ' ; cr . 
+	({ 4 . 80 } includes: scanCode)  
+	"Left arrow"
+		ifTrue: [ Transcript show: 'left arrow down ' ; show: bat position ; cr . 
 			       isMovingLeft := true. 
 			       isMovingRight := false.
 			 ].
-	({ 7 } includes: scanCode)  "Right arrow"
-		ifTrue: [ Transcript show: 'right arrow down' ; cr . 
+	({ 7 } includes: scanCode)  
+	"Right arrow"
+		ifTrue: [ Transcript show: 'right arrow down' ; show: bat position ; cr . 
 			       isMovingRight := true.
 			       isMovingLeft := false.
 			].
