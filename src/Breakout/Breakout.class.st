@@ -47,10 +47,22 @@ Breakout >> animateLeft [
 
 { #category : 'initialization' }
 Breakout >> animateRight [
-    | animation pos |
-    pos := bat position . 
+    | animation |
+
+  animation := BlTransformAnimation new        
+        duration: duration milliSeconds;
+        easing: BlLinearInterpolator default;
+        absolute;
+     "Move 300 pixels right"
+        transformDo: [ :aBuilder | aBuilder translateBy: ( 30 @ 0) ];  
+        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr.    ].
+    bat addAnimation: animation.
+
+
 
 #(
+    pos := bat position . 
+
     animation := BlTransformAnimation new        
         duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
@@ -62,9 +74,11 @@ Breakout >> animateRight [
 	                    "Transcript show: 'Animation done at: ', bat position asString; cr "
 	    ].
     bat addAnimation: animation.
-).
+
      pos := pos + (delta@0).
      bat position: pos . 
+
+).
 
 
 
@@ -87,6 +101,10 @@ Breakout >> gameHalt [
  isRunning := false . 
  [ Processor terminateActiveProcessNamed: 'GameLoop' ]
     on: Error do: [ :ex | Transcript show: 'No Game Loop process found'; cr ].
+
+"close the window"
+ aSpace close.
+ 
 
 
 
@@ -122,7 +140,7 @@ Breakout >> initialize [
 	super initialize. "make some bricks all random colours "
 
    "how far bat moves"
-   delta := 100 . 
+   delta := 10 . 
    "animated over what duration"
    duration := 300. 
 
