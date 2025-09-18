@@ -21,6 +21,10 @@ Class {
 { #category : 'initialization' }
 Breakout >> gameHalt [
  isRunning := false . 
+ [ Processor terminateActiveProcessNamed: 'Game Loop' ]
+    on: Error do: [ :ex | Transcript show: 'No Game Loop process found'; cr ].
+
+
 
 ]
 
@@ -29,6 +33,9 @@ Breakout >> gameLoop [
   [ 
     [ 
         [  self updateGame . 
+	        "request next pulse"
+			 aSpace requestNextPulse.
+	
           "(Delay forMilliseconds: 16) wait."
            Transcript show: 'tick' ; cr . 
  	       "wait one second "
@@ -149,11 +156,11 @@ Breakout >> keyUpEvent: anEvent [
 	| scanCode |	
 	scanCode := anEvent scanCode . 
 	({ 4 . 80 } includes: scanCode)  "Left arrow"
-		ifTrue: [ Transcript show: 'left arrow up' ; cr . 
+		ifTrue: [ Transcript show: 'left arrow up' ; show: bat position ; cr . 
 			     isMovingLeft := false.			     
 			       ].
 	({ 7 } includes: scanCode)  "Right arrow"
-		ifTrue: [ Transcript show: 'right arrow up' ; cr . 
+		ifTrue: [ Transcript show: 'right arrow up' ; show: bat position ; cr . 
 			    isMovingRight := false.   
 			 ].
 	"show the key that was pressed"
@@ -167,13 +174,17 @@ Breakout >> keyUpEvent: anEvent [
 { #category : 'initialization' }
 Breakout >> updateGame [
 
-	| newPosition |
-	newPosition := bat position.
-	isMovingLeft ifTrue: [ newPosition := newPosition - (delta @ 0) ].
-	isMovingRight ifTrue: [ newPosition := newPosition + (delta @ 0) ]. "Boundary checks"
-	newPosition x < 0 ifTrue: [ newPosition := 0 @ newPosition y ].
-	newPosition x > (aSpace extent x - bat extent x) ifTrue: [ newPosition := aSpace extent x - bat size x @ newPosition y ].
+	| pos |
+	pos := bat position.
+	isMovingLeft ifTrue: [ pos := pos - (delta @ 0) ].
+	isMovingRight ifTrue: [ pos := pos + (delta @ 0) ]. 
+	
+	#(
+	"Boundary checks"
+	pos x < 0 ifTrue: [ pos := 0 @ pos y ].
+	pos x > ((aSpace extent x) - (bat extent x)) ifTrue: [ pos := (aSpace extent x) - bat size x @ pos y ].
 	bat position: newPosition.
+	).
 	
 	 "do we need to tell somebody the bat has moved ? "
 ]
