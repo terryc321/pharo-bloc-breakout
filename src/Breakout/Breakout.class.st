@@ -11,12 +11,49 @@ Class {
 		'delta',
 		'isMovingLeft',
 		'isMovingRight',
-		'animation',
 		'isRunning'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
 }
+
+{ #category : 'initialization' }
+Breakout >> animateLeft [
+    | animation |
+    animation := BlTransformAnimation new
+        translateBy: -30@0;
+        duration: 200 milliSeconds;
+        easing: BlLinearInterpolator default;
+        absolute;
+        onFinishedDo: [ bat position: (bat position) - (30@0).  
+	                    Transcript show: 'Animation done at: ', self position asString; cr ].
+    bat addAnimation: animation.
+
+]
+
+{ #category : 'initialization' }
+Breakout >> animateRight [
+    | animation |
+    animation := BlTransformAnimation new
+        translateBy: 30@0;
+        duration: 200 milliSeconds;
+        easing: BlLinearInterpolator default;
+        absolute;
+        onFinishedDo: [ bat position: (bat position) + (30@0).  
+	                    Transcript show: 'Animation done at: ', self position asString; cr ].
+    bat addAnimation: animation.
+
+]
+
+{ #category : 'initialization' }
+Breakout >> animateStop [
+ "remove all animations from bat"
+    bat removeAnimations.
+
+
+
+
+]
 
 { #category : 'initialization' }
 Breakout >> gameHalt [
@@ -181,9 +218,9 @@ Breakout >> keyUpEvent: anEvent [
 Breakout >> updateGame [
 
 	| pos |
-	pos := bat position.
-	isMovingLeft ifTrue: [ pos := pos - (delta @ 0) ].
-	isMovingRight ifTrue: [ pos := pos + (delta @ 0) ]. 
+	pos := (bat position x) @ 600.
+	isMovingLeft ifTrue: [ self animateLeft ].
+	isMovingRight ifTrue: [ self animateRight ]. 
 	bat position:  pos . 
 	
 	#(
