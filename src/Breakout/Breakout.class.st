@@ -22,7 +22,8 @@ Class {
 Breakout >> animateLeft [
     | animation pos | 
     pos := bat position.         
-     
+
+#(     
     animation := BlTransformAnimation new
          duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
@@ -31,11 +32,16 @@ Breakout >> animateLeft [
         transformDo: [ :aBuilder | aBuilder translateBy: (0 - delta) @ 0 ];  
         onFinishedDo: [ bat position: pos - (0 - delta)@0. 
 	                  "bounds checks"
-	                     bat position x < 0 ifTrue: [ bat position: 0@(bat position y) ] .
+	                     (bat position x) - (delta max: 0). 
+	                  " ifTrue: [ bat position: 0@(bat position y) ] ."
 	                     bat extent: 100 @ 20 .  
 	                    "Transcript show: 'Animation done at: ', (bat position asString); cr "
 	                     ].
     bat addAnimation: animation.
+).
+
+     pos := pos - (delta@0).
+     bat position: pos . 
 
 ]
 
@@ -44,6 +50,7 @@ Breakout >> animateRight [
     | animation pos |
     pos := bat position . 
 
+#(
     animation := BlTransformAnimation new        
         duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
@@ -55,6 +62,10 @@ Breakout >> animateRight [
 	                    "Transcript show: 'Animation done at: ', bat position asString; cr "
 	    ].
     bat addAnimation: animation.
+).
+     pos := pos + (delta@0).
+     bat position: pos . 
+
 
 
 ]
