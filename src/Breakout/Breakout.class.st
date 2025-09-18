@@ -11,7 +11,8 @@ Class {
 		'delta',
 		'isMovingLeft',
 		'isMovingRight',
-		'isRunning'
+		'isRunning',
+		'duration'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
@@ -19,36 +20,47 @@ Class {
 
 { #category : 'initialization' }
 Breakout >> animateLeft [
-    | animation |
+    | animation pos |
+    pos := bat position. 
+     
     animation := BlTransformAnimation new
-        translateBy: -30@0;
-        duration: 200 milliSeconds;
+         duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
         absolute;
-        onFinishedDo: [ bat position: (bat position) - (30@0).  
-	                    Transcript show: 'Animation done at: ', self position asString; cr ].
+     "Move 30 pixels left"
+        transformDo: [ :aBuilder | aBuilder translateBy: (0 - delta) @ 0 ];  
+        onFinishedDo: [ bat position: pos - (0 - delta)@0.  
+	                    "Transcript show: 'Animation done at: ', (bat position asString); cr "
+	                     ].
     bat addAnimation: animation.
 
 ]
 
 { #category : 'initialization' }
 Breakout >> animateRight [
-    | animation |
-    animation := BlTransformAnimation new
-        translateBy: 30@0;
-        duration: 200 milliSeconds;
+    | animation pos |
+    pos := bat position . 
+
+    animation := BlTransformAnimation new        
+        duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
         absolute;
-        onFinishedDo: [ bat position: (bat position) + (30@0).  
-	                    Transcript show: 'Animation done at: ', self position asString; cr ].
+     "Move 300 pixels right"
+        transformDo: [ :aBuilder | aBuilder translateBy: (delta @ 0) ];  
+        onFinishedDo: [ bat position: pos + (delta@0).  
+	                    "Transcript show: 'Animation done at: ', bat position asString; cr "
+	    ].
     bat addAnimation: animation.
+
 
 ]
 
 { #category : 'initialization' }
 Breakout >> animateStop [
  "remove all animations from bat"
-    bat removeAnimations.
+  #(  bat removeAnimations. ).
+ ^ nil . 
+
 
 
 
@@ -93,7 +105,12 @@ Breakout >> gameLoop [
 Breakout >> initialize [
 
 	super initialize. "make some bricks all random colours "
-   delta := 10 . 
+
+   "how far bat moves"
+   delta := 20 . 
+   "animated over what duration"
+   duration := 30. 
+
    isMovingLeft := false. 
    isMovingRight := false. 
    isRunning := true. 
@@ -217,11 +234,15 @@ Breakout >> keyUpEvent: anEvent [
 { #category : 'initialization' }
 Breakout >> updateGame [
 
-	| pos |
+	#( | pos |
 	pos := (bat position x) @ 600.
+	).
+	
 	isMovingLeft ifTrue: [ self animateLeft ].
 	isMovingRight ifTrue: [ self animateRight ]. 
-	bat position:  pos . 
+	isMovingLeft not and: [ isMovingRight not ifTrue:[ self animateStop ]].
+	
+	#(bat position:  pos . ).
 	
 	#(
 	"Boundary checks"
