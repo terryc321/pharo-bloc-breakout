@@ -12,7 +12,7 @@ Class {
 		'isMovingLeft',
 		'isMovingRight',
 		'animation',
-		'stopMe'
+		'isRunning'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
@@ -20,7 +20,7 @@ Class {
 
 { #category : 'initialization' }
 Breakout >> gameHalt [
- stopMe := true . 
+ isRunning := false . 
 
 ]
 
@@ -33,7 +33,7 @@ Breakout >> gameLoop [
            Transcript show: 'tick' ; cr . 
  	       "wait one second "
           (Delay forMilliseconds: 1000) wait.          
-          stopMe.  ] whileTrue. 
+          isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
     ] on: Error do: [ :ex | Transcript cr; show: ex description ] 
 ] forkNamed: 'Game Loop'.
@@ -49,7 +49,7 @@ Breakout >> initialize [
    delta := 10 . 
    isMovingLeft := false. 
    isMovingRight := false. 
-   stopMe := false. 
+   isRunning := true. 
 
 	aSpace := BlSpace new. "make a window "
 	root := aSpace root. "access root element"
