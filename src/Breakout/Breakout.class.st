@@ -37,9 +37,12 @@ Breakout >> gameLoop [
 			 aSpace requestNextPulse.
 	
           "(Delay forMilliseconds: 16) wait."
-           Transcript show: 'tick' ; cr . 
+           #(Transcript show: 'tick' ; cr . ).
  	       "wait one second "
-          (Delay forMilliseconds: 1000) wait.          
+          "(Delay forMilliseconds: 1000) wait."          
+ 	       "wait 16 milliseconds second "
+          (Delay forMilliseconds: 16) wait.
+
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
     ] on: Error do: [ :ex | Transcript cr; show: ex description ] 
@@ -112,6 +115,7 @@ Breakout >> initialize [
   "Make element focusable"
    "root focusability: BlFocusability focusable;  "
 	root addEventHandler: (BlEventHandler on: BlKeyDownEvent do: [ :anEvent | self keyDownEvent: anEvent ]).
+	root addEventHandler: (BlEventHandler on: BlKeyUpEvent do: [ :anEvent | self keyUpEvent: anEvent ]).
 	"Request focus when initialized"
 	"root requestFocus  "
 	root focused: true . 
@@ -131,7 +135,7 @@ self gameLoop.
 { #category : 'initialization' }
 Breakout >> keyDownEvent: anEvent [
 	| scanCode |
-	delta := 0.
+	
 	scanCode := anEvent scanCode . 
 	({ 4 . 80 } includes: scanCode)  
 	"Left arrow"
@@ -139,7 +143,7 @@ Breakout >> keyDownEvent: anEvent [
 			       isMovingLeft := true. 
 			       isMovingRight := false.
 			 ].
-	({ 7 } includes: scanCode)  
+	({ 7 . 79 } includes: scanCode)  
 	"Right arrow"
 		ifTrue: [ Transcript show: 'right arrow down' ; show: bat position ; cr . 
 			       isMovingRight := true.
@@ -161,7 +165,7 @@ Breakout >> keyUpEvent: anEvent [
 		ifTrue: [ Transcript show: 'left arrow up' ; show: bat position ; cr . 
 			     isMovingLeft := false.			     
 			       ].
-	({ 7 } includes: scanCode)  "Right arrow"
+	({ 7 . 79 } includes: scanCode)  "Right arrow"
 		ifTrue: [ Transcript show: 'right arrow up' ; show: bat position ; cr . 
 			    isMovingRight := false.   
 			 ].
