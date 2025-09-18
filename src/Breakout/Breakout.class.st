@@ -7,7 +7,11 @@ Class {
 		'bat',
 		'ball',
 		'rectangle',
-		'circle'
+		'circle',
+		'delta',
+		'isMovingLeft',
+		'isMovingRight',
+		'animation'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
@@ -17,6 +21,10 @@ Class {
 Breakout >> initialize [
 
 	super initialize. "make some bricks all random colours "
+   delta := 10 . 
+   isMovingLeft := false. 
+   isMovingRight := false. 
+
 
 	aSpace := BlSpace new. "make a window "
 	root := aSpace root. "access root element"
@@ -79,33 +87,92 @@ Breakout >> initialize [
 "aSpace root addEventHandler: (BlEventHandler on: BlKeyDownEvent do: [ :anEvent | bat keyDownEvent: anEvent ])."
 aSpace root addEventHandler: (BlEventHandler on: BlKeyDownEvent do: [ :anEvent | self keyDownEvent: anEvent ]).
 
+"================================================"
+"Create a game loop using BlTask"
+"aSpace addEventHandler: (BlEventHandler on: BlSpaceFrameEvent do: [ :anEvent |
+    self tick.
+])."
+
+"=================================================="
+"Create an animation loop"
+animation := BlAnimation new
+    duration: 16 milliSeconds; "Roughly 60 FPS"
+    onStepDo: [ :aDeltaTime |
+        | newPosition |
+        newPosition := bat position.
+        isMovingLeft ifTrue: [ newPosition := newPosition - (delta @ 0) ].
+        isMovingRight ifTrue: [ newPosition := newPosition + (delta @ 0) ].
+        
+        "Boundary checks"
+        newPosition x < 0 ifTrue: [ newPosition := 0 @ newPosition y ].
+        newPosition x > (aSpace extent x - bat size x) ifTrue: [ 
+            newPosition := (aSpace extent x - bat size x) @ newPosition y ].
+        
+        bat position: newPosition.
+    ];
+    loopCount: -1. "Run indefinitely"
+
+"Start the animation"
+aSpace enqueueTask: animation.
+
+"finally show window "
 	aSpace show
 ]
 
 { #category : 'initialization' }
 Breakout >> keyDownEvent: anEvent [
-	| delta scanCode |
+	| scanCode |
 	delta := 0.
 	scanCode := anEvent scanCode . 
 	({ 4 . 80 } includes: scanCode)  "Left arrow"
-		ifTrue: [ Transcript show: 'left arrow pressed' ; cr . 
-			       delta := -10 ].
+		ifTrue: [ Transcript show: 'left arrow down ' ; cr . 
+			       isMovingLeft := true. 
+			       isMovingRight := false.
+			 ].
 	({ 7 } includes: scanCode)  "Right arrow"
-		ifTrue: [ Transcript show: 'right arrow pressed' ; cr . 
-			       delta := 10 ].
+		ifTrue: [ Transcript show: 'right arrow down' ; cr . 
+			       isMovingRight := true.
+			       isMovingLeft := false.
+			].
+	"show the key that was pressed"
+	"track how far left or right"	
+	Transcript show: 'key scancode = ' ; show: anEvent scanCode ; cr.
+	anEvent consumed: true  "Prevent event bubbling".
+	
+
+]
+
+{ #category : 'initialization' }
+Breakout >> keyUpEvent: anEvent [
+	| scanCode |	
+	scanCode := anEvent scanCode . 
+	({ 4 . 80 } includes: scanCode)  "Left arrow"
+		ifTrue: [ Transcript show: 'left arrow up' ; cr . 
+			     isMovingLeft := false.			     
+			       ].
+	({ 7 } includes: scanCode)  "Right arrow"
+		ifTrue: [ Transcript show: 'right arrow up' ; cr . 
+			    isMovingRight := false.   
+			 ].
 	"show the key that was pressed"
 	Transcript show: 'key scancode = ' ; show: anEvent scanCode ; cr . 
-	"track how far left or right"
-	delta ~= 0
-		ifTrue: [
-	 	   "move bat"
-			bat position: (bat position + (delta@0)).
-			"move ball"
-			ball position: (ball position + (delta@0)).
-			 "Trigger relayout for visual update"
-			"aSpace ifNotNil: [ :s | s requestLayout ] " 
-			].
+	
 	anEvent consumed: true  "Prevent event bubbling".
+	
+
+]
+
+{ #category : 'initialization' }
+Breakout >> tick [
+	"move bat"
+	isMovingRight ifTrue: [  
+		bat position: (bat position + (delta@0)).
+	]
+	isMovingLeft ifTrue: [  
+		bat position: (bat position - (delta@0)).
+	]
+
+
 	
 
 ]
