@@ -47,16 +47,21 @@ Breakout >> animateLeft [
 
 { #category : 'initialization' }
 Breakout >> animateRight [
-    | animation |
+    | animation pos |
 
   animation := BlTransformAnimation new        
         duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
         absolute;
      "Move 300 pixels right"
-        transformDo: [ :aBuilder | aBuilder translateBy: ( 30 @ 0) ];  
-        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr.    ].
+        transformDo: [ :aBuilder | aBuilder translateBy: ( delta @ 0) ];  
+        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr. 
+	                     "bat position: (bat position x + delta)@(bat position y). "
+	                   ].
     bat addAnimation: animation.
+
+    "self listAnimations ."
+
 
 
 
@@ -123,7 +128,7 @@ Breakout >> gameLoop [
  	       "wait one second "
           "(Delay forMilliseconds: 1000) wait."          
  	       "wait 16 milliseconds second "
-          (Delay forMilliseconds: 16) wait.
+          (Delay forMilliseconds: 600) wait.
 
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
@@ -140,9 +145,9 @@ Breakout >> initialize [
 	super initialize. "make some bricks all random colours "
 
    "how far bat moves"
-   delta := 10 . 
+   delta := 100 . 
    "animated over what duration"
-   duration := 300. 
+   duration := 400. 
 
    isMovingLeft := false. 
    isMovingRight := false. 
@@ -262,6 +267,19 @@ Breakout >> keyUpEvent: anEvent [
 	anEvent consumed: true  "Prevent event bubbling".
 	
 
+]
+
+{ #category : 'initialization' }
+Breakout >> listAnimations [
+    | animationList |
+   "get all the bat animations - may be accumulating , stop animations , keep adding more animations , result in jerky flow"
+    animationList := bat animations.
+    Transcript show: 'Animations on ', self asString, ': ', animationList size asString; cr.
+    animationList do: [ :anAnimation | 
+        Transcript show: ' - Animation: ', anAnimation class name, 
+                        ', Duration: ', anAnimation duration asString,
+                        ', Is running: ', anAnimation isRunning asString; cr ].
+    ^ animationList
 ]
 
 { #category : 'initialization' }
