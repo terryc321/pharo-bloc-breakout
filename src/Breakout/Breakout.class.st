@@ -12,7 +12,8 @@ Class {
 		'isMovingLeft',
 		'isMovingRight',
 		'isRunning',
-		'duration'
+		'duration',
+		'isAnimating'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
@@ -21,27 +22,24 @@ Class {
 { #category : 'initialization' }
 Breakout >> animateLeft [
     | animation pos | 
-    pos := bat position.         
+   isAnimating ifTrue: [  ] ifFalse: [ 
 
-#(     
-    animation := BlTransformAnimation new
-         duration: duration milliSeconds;
+   animation := BlTransformAnimation new        
+        duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
         absolute;
-     "Move 30 pixels left"
-        transformDo: [ :aBuilder | aBuilder translateBy: (0 - delta) @ 0 ];  
-        onFinishedDo: [ bat position: pos - (0 - delta)@0. 
-	                  "bounds checks"
-	                     (bat position x) - (delta max: 0). 
-	                  " ifTrue: [ bat position: 0@(bat position y) ] ."
-	                     bat extent: 100 @ 20 .  
-	                    "Transcript show: 'Animation done at: ', (bat position asString); cr "
-	                     ].
+     "Move 300 pixels right"
+        transformDo: [ :aBuilder | aBuilder translateBy: ( (0 - delta) @ 0) ];  
+        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr. 
+	                     isAnimating := false.
+	                     bat position: (bat position x - delta)@(bat position y). 
+	                   ].
     bat addAnimation: animation.
-).
+    isAnimating := true. 
+   ].
+   
+ " aSpace requestNextPulse."
 
-     pos := pos - (delta@0).
-     bat position: pos . 
 
 ]
 
@@ -49,16 +47,23 @@ Breakout >> animateLeft [
 Breakout >> animateRight [
     | animation pos |
 
+ isAnimating ifTrue: [  ] ifFalse:[
   animation := BlTransformAnimation new        
         duration: duration milliSeconds;
         easing: BlLinearInterpolator default;
         absolute;
      "Move 300 pixels right"
         transformDo: [ :aBuilder | aBuilder translateBy: ( delta @ 0) ];  
-        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr. 
-	                     "bat position: (bat position x + delta)@(bat position y). "
+        onFinishedDo: [ Transcript show: 'Animation done at: ', bat position asString; cr. 	                    
+	                      isAnimating := false.
+							 bat position: (bat position x + delta)@(bat position y). 
+						
 	                   ].
     bat addAnimation: animation.
+    isAnimating := true. 
+   ].
+
+   "aSpace requestNextPulse."
 
     "self listAnimations ."
 
@@ -128,7 +133,7 @@ Breakout >> gameLoop [
  	       "wait one second "
           "(Delay forMilliseconds: 1000) wait."          
  	       "wait 16 milliseconds second "
-          (Delay forMilliseconds: 600) wait.
+          (Delay forMilliseconds: 16) wait.
 
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
@@ -143,6 +148,7 @@ Breakout >> gameLoop [
 Breakout >> initialize [
 
 	super initialize. "make some bricks all random colours "
+   isAnimating := false. 
 
    "how far bat moves"
    delta := 100 . 
@@ -271,15 +277,17 @@ Breakout >> keyUpEvent: anEvent [
 
 { #category : 'initialization' }
 Breakout >> listAnimations [
-    | animationList |
-   "get all the bat animations - may be accumulating , stop animations , keep adding more animations , result in jerky flow"
-    animationList := bat animations.
-    Transcript show: 'Animations on ', self asString, ': ', animationList size asString; cr.
-    animationList do: [ :anAnimation | 
-        Transcript show: ' - Animation: ', anAnimation class name, 
-                        ', Duration: ', anAnimation duration asString,
-                        ', Is running: ', anAnimation isRunning asString; cr ].
-    ^ animationList
+ | animations |
+ animations := bat taskQueue tasks select: [ :task | task isKindOf: BlAnimation ].
+animations do: [ :anim |
+    Transcript
+        show: anim class name, ' (Duration: ', anim duration asString, ', State: ', anim state asString, ')';
+        cr ].
+
+"Optionally stop all animations"
+animations do: [ :anim | bat removeAnimation: anim ].
+
+
 ]
 
 { #category : 'initialization' }
