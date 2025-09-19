@@ -68,7 +68,7 @@ Breakout >> animateStop [
 
 { #category : 'initialization' }
 Breakout >> ballCount [
- ^ 10 .
+ ^ 100 .
 
 ]
 
@@ -168,7 +168,8 @@ Breakout >> initialize [
 		       yourself.
 	root addChild: bat.
 
-   ball := BallElement new.
+   ball := SquareElement new.
+   
 	balls := OrderedCollection new. 
 	rand := Random new. 
 	wid := aSpace extent x.
@@ -180,8 +181,9 @@ Breakout >> initialize [
 		          velocity: ((rand next * 20) floor @ (rand next * 20) floor ).
 		 tmp delta: delta.
 		"make every BallElement part of scene"
-		 root addChild: tmp. 
-		 balls add: tmp.
+		 #(root addChild: tmp. 
+		 balls add: tmp.).
+		
 		              ].
 	ballvx := 10. 
 	ballvy := 10. 
