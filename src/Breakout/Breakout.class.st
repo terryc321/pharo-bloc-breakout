@@ -25,7 +25,8 @@ Class {
 		'duration',
 		'isAnimating',
 		'ballvx',
-		'ballvy'
+		'ballvy',
+		'balls'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
@@ -92,7 +93,7 @@ Breakout >> gameLoop [
  	       "wait one second "
           "(Delay forMilliseconds: 1000) wait."          
  	       "wait 16 milliseconds second "
-          (Delay forMilliseconds: 1000) wait.
+          (Delay forMilliseconds: 16) wait.
 
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
@@ -106,11 +107,12 @@ Breakout >> gameLoop [
 { #category : 'initialization' }
 Breakout >> initialize [
 
+	| rand wid hgt |
 	super initialize. "make some bricks all random colours "
    isAnimating := false. 
 
    "how far bat moves"
-   delta := 100 . 
+   delta := 10 . 
    "animated over what duration"
    duration := 400. 
 
@@ -160,14 +162,19 @@ Breakout >> initialize [
 		       yourself.
 	root addChild: bat.
 
-	ball := BlElement new
-		        background: Color red;
-		        geometry: BlCircleGeometry new;
-		        position: 400 @ 500;
-		        extent: 20 @ 20;
-		        yourself.
+   ball := BallElement new.
+	balls := OrderedCollection new. 
+	rand := Random new. 
+	wid := aSpace extent x.
+	hgt := aSpace extent y.
+	1 to: 100 do: [ :n |
+		 |tmp | 
+		 tmp := BallElement new 
+		          position: (rand nextValue * wid @ rand nextValue * hgt) ;
+		          velocity: (rand nextValue * 20 @ rand nextValue * 20) 
+		              ].
 	ballvx := 10. 
-	ballvy := -10. 
+	ballvy := 10. 
 	
 	
 	root addChild: ball.
@@ -254,6 +261,7 @@ Breakout >> keyUpEvent: anEvent [
 
 { #category : 'initialization' }
 Breakout >> listAnimations [
+" this routine does not even work"
  | animations |
  animations := bat taskQueue tasks select: [ :task | task isKindOf: BlAnimation ].
 animations do: [ :anim |
@@ -270,6 +278,7 @@ animations do: [ :anim | bat removeAnimation: anim ].
 { #category : 'initialization' }
 Breakout >> updateBall [
 	| pos x y vx vy board wid hgt |
+
   pos := ball position.
   x := pos x. 
   y := pos y.
@@ -284,10 +293,18 @@ Breakout >> updateBall [
 
   x < 0 ifTrue: [ vx := 0 - vx ].
   y < 0 ifTrue: [ vy := 0 - vy ].
-  x > wid ifTrue: [ vx := 0 - vx ].
-  y > hgt ifTrue: [ vy := 0 - vy ].
+  x > wid ifTrue: [ vx := 0 - vx . x := wid - delta ].
+  y > hgt ifTrue: [ vy := 0 - vy . y := hgt - delta ].
 
   ball position: x @ y . 
+#(
+  Transcript show: 'board has size = '; show: board ; cr . 
+  Transcript show: 'ball position is '; show: ball position ; cr . 
+  Transcript show: 'ball velocity is '; show: ballvx ; show: ',' ; show: ballvy  ; cr . 
+).
+  ballvx := vx .
+  ballvy := vy . 
+
 
 
    
