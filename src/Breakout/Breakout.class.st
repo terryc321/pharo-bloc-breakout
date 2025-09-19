@@ -24,8 +24,6 @@ Class {
 		'isRunning',
 		'duration',
 		'isAnimating',
-		'ballvx',
-		'ballvy',
 		'balls'
 	],
 	#category : 'Breakout',
@@ -170,7 +168,7 @@ Breakout >> initialize [
 		       yourself.
 	root addChild: bat.
 
-   ball := SquareElement new.
+   ball := BallElement new velocity: 10@10 . 
    
 	balls := OrderedCollection new. 
 	rand := Random new. 
@@ -183,13 +181,10 @@ Breakout >> initialize [
 		          velocity: ((rand next * 20) floor @ (rand next * 20) floor ).
 		 tmp delta: delta.
 		"make every BallElement part of scene"
-		 #(root addChild: tmp. 
-		 balls add: tmp.).
+		#( root addChild: tmp. 
+		 balls add: tmp).
 		
-		              ].
-	ballvx := 10. 
-	ballvy := 10. 
-	
+	              ].
 	
 	root addChild: ball.
    "aSpace root focus: true.  "
@@ -285,8 +280,8 @@ Breakout >> updateBall [
   pos := ball position.
   x := pos x. 
   y := pos y.
-  vx := ballvx . 
-  vy := ballvy .
+  vx := ball vx . 
+  vy := ball vy .
   board := aSpace extent.
   wid := board x . 
   hgt := board y . 
@@ -305,8 +300,7 @@ Breakout >> updateBall [
   Transcript show: 'ball position is '; show: ball position ; cr . 
   Transcript show: 'ball velocity is '; show: ballvx ; show: ',' ; show: ballvy  ; cr . 
 ).
-  ballvx := vx .
-  ballvy := vy . 
+  ball velocity: vx@vy .
 
   "have we hit a brick ? "
 
@@ -337,6 +331,7 @@ Breakout >> updateBall [
 
   "have we hit the bat ? " 
   "assumption is that the ball is above the bat ? "
+
 [  | bx by bx2 by2 col hit | 
 	 bx := bat position x.
 	 by := bat position y.
@@ -351,7 +346,7 @@ Breakout >> updateBall [
     col do: [ :e | 
 	      e ifFalse: [ hit := false ] ].
 	  
-     hit ifTrue: [ 
+     hit ifTrue: [ 	     
 	        "ball is moving to right vx > 0 flip vy "
    	        "ball is moving to left vx < 0 flip vy "
 	        ball velocity: (ball vx)@(0 - (ball vy)).
