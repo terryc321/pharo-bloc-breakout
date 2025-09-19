@@ -174,6 +174,7 @@ Breakout >> initialize [
 		          velocity: (rand next * 20 @ rand next * 20).
 		"make every BallElement part of scene"
 		 root addChild: tmp. 
+		 balls add: tmp.
 		              ].
 	ballvx := 10. 
 	ballvy := 10. 
@@ -308,9 +309,9 @@ Breakout >> updateBall [
   ballvy := vy . 
 
   "update each ball"
-  balls do: [ :aBall | aBall updateBall  ]
+  balls do: [ :aBall | aBall updateBall  ].
 
-
+Transcript show: 'balls[1] position is '; show: (balls at: 1) position ; cr . 
 
    
 
