@@ -92,7 +92,7 @@ Breakout >> gameLoop [
  	       "wait one second "
           "(Delay forMilliseconds: 1000) wait."          
  	       "wait 16 milliseconds second "
-          (Delay forMilliseconds: 2) wait.
+          (Delay forMilliseconds: 1000) wait.
 
           isRunning.  ] whileTrue. 
        "keep looping while last thing evald is true "
