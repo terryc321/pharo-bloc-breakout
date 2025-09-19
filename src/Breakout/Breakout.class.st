@@ -1,3 +1,13 @@
+"
+use arrow keys left / right 
+use keys a / d to move bat left and right
+
+motion of bat seems jerky - solutions ? 
+
+tried animation BlAnimation but using an event loop in background seems to jam it up
+
+
+"
 Class {
 	#name : 'Breakout',
 	#superclass : 'Object',
@@ -13,7 +23,9 @@ Class {
 		'isMovingRight',
 		'isRunning',
 		'duration',
-		'isAnimating'
+		'isAnimating',
+		'ballvx',
+		'ballvy'
 	],
 	#category : 'Breakout',
 	#package : 'Breakout'
@@ -154,6 +166,10 @@ Breakout >> initialize [
 		        position: 400 @ 500;
 		        extent: 20 @ 20;
 		        yourself.
+	ballvx := 10. 
+	ballvy := -10. 
+	
+	
 	root addChild: ball.
    "aSpace root focus: true.  "
    "Request keyboard focus for the root (enables key events)"
@@ -252,10 +268,40 @@ animations do: [ :anim | bat removeAnimation: anim ].
 ]
 
 { #category : 'initialization' }
+Breakout >> updateBall [
+	| pos x y vx vy board wid hgt |
+  pos := ball position.
+  x := pos x. 
+  y := pos y.
+  vx := ballvx . 
+  vy := ballvy .
+  board := aSpace extent.
+  wid := board x . 
+  hgt := board y . 
+
+  x := x + vx . 
+  y := y + vy .
+
+  x < 0 ifTrue: [ vx := 0 - vx ].
+  y < 0 ifTrue: [ vy := 0 - vy ].
+  x > wid ifTrue: [ vx := 0 - vx ].
+  y > hgt ifTrue: [ vy := 0 - vy ].
+
+  ball position: x @ y . 
+
+
+   
+
+]
+
+{ #category : 'initialization' }
 Breakout >> updateGame [
 	
 	isMovingLeft ifTrue: [ self animateLeft ].
 	isMovingRight ifTrue: [ self animateRight ]. 
 	isMovingLeft not and: [ isMovingRight not ifTrue:[ self animateStop ]].
+  
+   self updateBall.
+
 
 ]
