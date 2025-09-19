@@ -67,6 +67,12 @@ Breakout >> animateStop [
 ]
 
 { #category : 'initialization' }
+Breakout >> ballCount [
+ ^ 10 .
+
+]
+
+{ #category : 'initialization' }
 Breakout >> gameHalt [
  isRunning := false . 
  [ Processor terminateActiveProcessNamed: 'GameLoop' ]
@@ -167,11 +173,12 @@ Breakout >> initialize [
 	rand := Random new. 
 	wid := aSpace extent x.
 	hgt := aSpace extent y.
-	1 to: 100 do: [ :n |
+	1 to: self ballCount do: [ :n |
 		 |tmp | 
 		 tmp := BallElement new 
-		          position: (rand next * 20 @ rand next * 30) ;
-		          velocity: (rand next * 20 @ rand next * 20).
+		          position: ((rand next * 20) floor @ (rand next * 30) floor) ;
+		          velocity: ((rand next * 20) floor @ (rand next * 20) floor ).
+		 tmp delta: delta.
 		"make every BallElement part of scene"
 		 root addChild: tmp. 
 		 balls add: tmp.
@@ -311,7 +318,7 @@ Breakout >> updateBall [
   "update each ball"
   balls do: [ :aBall | aBall updateBall: aSpace extent  ].
 
-Transcript show: 'balls[1] position is '; show: (balls at: 1) position ; cr . 
+#(Transcript show: 'balls[1] position is '; show: (balls at: 1) position ; cr . ).
 
    
 

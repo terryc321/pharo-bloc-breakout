@@ -11,9 +11,15 @@ Class {
 }
 
 { #category : 'initialization' }
+BallElement >> delta:  n [
+ delta := n . 
+
+]
+
+{ #category : 'initialization' }
 BallElement >> initialize [ 
  super initialize.
- self  background: Color red;
+ self  background: Color random;
 		        geometry: BlCircleGeometry new;
 		        position: 400 @ 500;
 		        extent: 20 @ 20.
