@@ -336,6 +336,29 @@ Breakout >> updateBall [
 	      root removeChild: aBrick  ].
 
   "have we hit the bat ? " 
+  "assumption is that the ball is above the bat ? "
+[  | bx by bx2 by2 col hit | 
+	 bx := bat position x.
+	 by := bat position y.
+	 bx2 := (bat position + bat extent) x . 
+    by2 := (bat position + bat extent) y . 
+    col := OrderedCollection new. 
+    col add: x > bx . 
+    col add: x < bx2 . 
+    col add: y > by .
+    col add: y < by2 . 
+    hit := true . 
+    col do: [ :e | 
+	      e ifFalse: [ hit := false ] ].
+	  
+     hit ifTrue: [ 
+	        "ball is moving to right vx > 0 flip vy "
+   	        "ball is moving to left vx < 0 flip vy "
+	        ball velocity: (ball vx)@(0 - (ball vy)).
+	      ]] value.
+
+
+
 
 
   "update each ball"

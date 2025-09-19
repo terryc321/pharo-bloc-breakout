@@ -62,3 +62,18 @@ BallElement >> velocity: aVelocity [
 	vy := aVelocity y.
 	
 ]
+
+{ #category : 'initialization' }
+BallElement >> vx [
+ ^ vx 
+
+	
+]
+
+{ #category : 'initialization' }
+BallElement >> vy [
+ ^ vy 
+
+
+	
+]
