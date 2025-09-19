@@ -16,7 +16,7 @@ Class {
 		'root',
 		'bat',
 		'ball',
-		'rectangle',
+		'bricks',
 		'circle',
 		'delta',
 		'isMovingLeft',
@@ -151,6 +151,7 @@ Breakout >> initialize [
 	aSpace root background: Color blue.
 	aSpace title: 'Breakout'. " extent: 500@500 . "
 
+	bricks := OrderedCollection new.    
 	1 to: 20 do: [ :x |
 			1 to: 20 do: [ :y |
 					| rectangle |
@@ -159,7 +160,8 @@ Breakout >> initialize [
 						             position: 40 * x @ (20 * y);
 						             extent: 40 @ 20;
 						             yourself.
-					root addChild: rectangle ] ].
+					root addChild: rectangle .
+					bricks add: rectangle. ] ].
 
 	bat := BlElement new
 		       background: Color red;
@@ -273,23 +275,12 @@ Breakout >> keyUpEvent: anEvent [
 
 { #category : 'initialization' }
 Breakout >> listAnimations [
-" this routine does not even work"
- | animations |
- animations := bat taskQueue tasks select: [ :task | task isKindOf: BlAnimation ].
-animations do: [ :anim |
-    Transcript
-        show: anim class name, ' (Duration: ', anim duration asString, ', State: ', anim state asString, ')';
-        cr ].
-
-"Optionally stop all animations"
-animations do: [ :anim | bat removeAnimation: anim ].
-
-
+ self error: 'shouldNotImplement'.
 ]
 
 { #category : 'initialization' }
 Breakout >> updateBall [
-	| pos x y vx vy board wid hgt |
+	| pos x y vx vy board wid hgt removals |
 
   pos := ball position.
   x := pos x. 
@@ -316,6 +307,36 @@ Breakout >> updateBall [
 ).
   ballvx := vx .
   ballvy := vy . 
+
+  "have we hit a brick ? "
+
+ "ball position is not a continuous thing , it is discrete one point its here , next tick its over there "
+ "is ball in vicinity such that it MAY have touched brick ? "
+ removals := OrderedCollection new. 
+ bricks do: [ :aBrick | 
+	 | bx by bx2 by2 col hit | 
+	 bx := aBrick position x.
+	 by := aBrick position y.
+	 bx2 := (aBrick position + aBrick extent) x . 
+    by2 := (aBrick position + aBrick extent) y . 
+    col := OrderedCollection new. 
+    col add: x > bx . 
+    col add: x < bx2 . 
+    col add: y > by .
+    col add: y < by2 . 
+    hit := true . 
+    col do: [ :e | 
+	      e ifFalse: [ hit := false ] ].
+	  
+     hit ifTrue: [ 
+	        "remove this brick from collection of bricks , remove it from the root of scene "
+	      removals add: aBrick. ]].
+     removals do: [ :aBrick | 
+	      bricks remove: aBrick.
+	      root removeChild: aBrick  ].
+
+  "have we hit the bat ? " 
+
 
   "update each ball"
   balls do: [ :aBall | aBall updateBall: aSpace extent  ].
